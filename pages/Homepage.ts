@@ -6,10 +6,10 @@ export class Homepage extends HelperBase {
   readonly pieChartPanels: Locator;
   private gridHelper: GridHelper;
 
-  constructor(page: Page) {
+  constructor(page: Page, gridSelector: string) {
     super(page);
     this.pieChartPanels = page.locator('.panel-card');
-    this.gridHelper = new GridHelper(page, '.machines-container'); // Pass the grid container locator
+    this.gridHelper = new GridHelper(page, gridSelector);
   }
 
   /**

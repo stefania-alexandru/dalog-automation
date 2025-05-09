@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test('should update Machine Conditions table when Conditions pie chartfilter is clicked', async ({
   page,
 }) => {
-  const homepage = new Homepage(page);
+  const homepage = new Homepage(page, '.machines-container');
 
   await homepage.clickFilterInPieChart(2, 1);
   await homepage.validateMachineConditions();
