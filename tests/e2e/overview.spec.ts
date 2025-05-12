@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
-test('should update Machine Conditions table when Conditions pie chartfilter is clicked', async ({
+test('should update Machine Conditions table when Conditions piechart filter is clicked', async ({
   page,
 }) => {
   const homepage = new Homepage(page, '.machines-container');
