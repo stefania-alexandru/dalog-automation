@@ -11,7 +11,7 @@ test('should update Machine Conditions table when Conditions piechart filter is 
   const homepage = new Homepage(page, '.machines-container');
 
   await homepage.clickFilterInPieChart(2, 1);
-  await homepage.validateMachineConditions();
+  await homepage.validateMachineConditionsColumn();
 });
 
 test('should update Machine Conditions table when Last Data piechart filter is clicked', async ({
@@ -20,5 +20,5 @@ test('should update Machine Conditions table when Last Data piechart filter is c
   const homepage = new Homepage(page, '.machines-container');
 
   await homepage.clickFilterInPieChart(3, 1);
-  await homepage.validateLastData();
+  await homepage.validateLastDataUpdateColumn();
 });

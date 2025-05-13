@@ -27,11 +27,11 @@ export class Homepage extends HelperBase {
     await filterCircle.click();
   }
 
-  async validateMachineConditions() {
+  async validateMachineConditionsColumn() {
     await this.gridHelper.assertColumnValuesAreConsistent('Condition');
   }
 
-  async validateLastData() {
+  async validateLastDataUpdateColumn() {
     await this.gridHelper.assertColumnValuesHaveTheSameColor(
       'Last Data Update'
     );
