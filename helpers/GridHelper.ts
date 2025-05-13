@@ -31,7 +31,7 @@ export class GridHelper extends HelperBase {
     return await columnCells.allTextContents();
   }
 
-  public async assertColumnValuesAreConsistent(columnName: string) {
+   public async assertColumnValuesAreConsistent(columnName: string) {
     const columnIndex = await this.getColumnIndexByName(columnName);
     const columnTexts = await this.getColumnTextContents(columnIndex);
 
@@ -44,6 +44,27 @@ export class GridHelper extends HelperBase {
       if (columnTexts[i] !== firstConditionText) {
         throw new Error(
           `Inconsistent value found in the "${columnName}" column`
+        );
+      }
+    }
+  }
+  
+  public async assertColumnValuesHaveTheSameColor(columnName: string) {
+    const columnIndex = await this.getColumnIndexByName(columnName);
+    const columnCells = this.gridLocator.locator(
+      `[role="gridcell"]:nth-child(${columnIndex + 2})`
+    );
+    const firstCellColor = await columnCells.nth(0).evaluate((el) => {
+      return window.getComputedStyle(el).color;
+    });
+
+    for (let i = 1; i < await columnCells.count(); i++) {
+      const cellColor = await columnCells
+        .nth(i)
+        .evaluate((el) => window.getComputedStyle(el).color);
+      if (cellColor !== firstCellColor) {
+        throw new Error(
+          `Inconsistent color found in the "${columnName}" column`
         );
       }
     }

@@ -30,4 +30,10 @@ export class Homepage extends HelperBase {
   async validateMachineConditions() {
     await this.gridHelper.assertColumnValuesAreConsistent('Condition');
   }
+
+  async validateLastData() {
+    await this.gridHelper.assertColumnValuesHaveTheSameColor(
+      'Last Data Update'
+    );
+  }
 }
