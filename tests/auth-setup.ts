@@ -2,8 +2,9 @@ import { test as setup, expect } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
 
-const authFile = path.join(__dirname, '../.auth/user.json');
-const tokenFile = path.join(__dirname, '../.auth/token.json');
+const authDir = path.join(__dirname, '../.auth');
+const authFile = path.join(authDir, 'user.json');
+const tokenFile = path.join(authDir, 'token.json');
 
 setup('authenticate and capture token', async ({ page }) => {
   const email = process.env.EMAIL;
@@ -11,6 +12,10 @@ setup('authenticate and capture token', async ({ page }) => {
 
   if (!email || !password) {
     throw new Error('Missing EMAIL or PASSWORD in .env');
+  }
+
+  if (!fs.existsSync(authDir)) {
+    fs.mkdirSync(authDir, { recursive: true });
   }
 
   page.on('response', async (response) => {
