@@ -1,6 +1,7 @@
 import { expect, Locator, Page, request } from '@playwright/test';
 import { HelperBase } from '../helpers/HelperBase';
 import { ModalHelper } from '../helpers/Modal';
+import { getAuthorizedRequestContext } from '../utils/requestContext';
 import { faker } from '@faker-js/faker';
 import * as dotenv from 'dotenv';
 
@@ -52,7 +53,7 @@ export class Corporation extends HelperBase {
   }
 
   async verifyCorporationExistsViaAPI(corporationName: string): Promise<void> {
-    const requestContext = await this.getAuthorizedRequestContext();
+    const requestContext = await getAuthorizedRequestContext();
     const response = await requestContext.get('/dev/meta/read/v1/corporations');
 
     expect(response.ok()).toBeTruthy();
