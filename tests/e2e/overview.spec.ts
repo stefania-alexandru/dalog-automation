@@ -11,7 +11,8 @@ test('should update Machine Conditions table when Conditions piechart filter is 
   const homepage = new Homepage(page, '.machines-container');
 
   await homepage.clickFilterInPieChart(2, 1);
-  await homepage.validateMachineConditionsColumn();
+  const expectedCondition = await homepage.validateMachineConditionsColumn();
+  expect(expectedCondition).toBe('Indication');
 });
 
 test('should update Machine Conditions table when Last Data piechart filter is clicked', async ({
@@ -20,5 +21,6 @@ test('should update Machine Conditions table when Last Data piechart filter is c
   const homepage = new Homepage(page, '.machines-container');
 
   await homepage.clickFilterInPieChart(3, 1);
-  await homepage.validateLastDataUpdateColumn();
+  const expectedColor = await homepage.validateLastDataUpdateColumn();
+  expect(expectedColor).toBe('rgb(255, 204, 0)');
 });

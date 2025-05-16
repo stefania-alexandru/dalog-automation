@@ -1,15 +1,28 @@
 import { test as setup, expect } from '@playwright/test';
 import path from 'path';
+import fs from 'fs';
 
 const authFile = path.join(__dirname, '../.auth/user.json');
+const tokenFile = path.join(__dirname, '../.auth/token.json');
 
-setup('authenticate', async ({ page }) => {
+setup('authenticate and capture token', async ({ page }) => {
   const email = process.env.EMAIL;
   const password = process.env.PASSWORD;
 
   if (!email || !password) {
     throw new Error('Missing EMAIL or PASSWORD in .env');
   }
+
+  page.on('response', async (response) => {
+    if (response.url().includes('/token') && response.status() === 200) {
+      const jsonResponse = await response.json();
+      const token = jsonResponse.access_token;
+
+      if (token) {
+        fs.writeFileSync(tokenFile, JSON.stringify({ access_token: token }));
+      }
+    }
+  });
 
   await page.goto('/');
   await page.getByRole('textbox', { name: 'Email address' }).fill(email);
@@ -18,7 +31,6 @@ setup('authenticate', async ({ page }) => {
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
 
   await page.waitForURL('/');
-
   await expect(
     page.getByRole('button', { name: 'Quick Settings' })
   ).toBeVisible();
