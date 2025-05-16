@@ -2,9 +2,7 @@ import { expect, Locator, Page, request } from '@playwright/test';
 import { HelperBase } from '../helpers/HelperBase';
 import { ModalHelper } from '../helpers/Modal';
 import { faker } from '@faker-js/faker';
-import fs from 'fs/promises';
 import * as dotenv from 'dotenv';
-import path from 'path';
 
 dotenv.config();
 
