@@ -1,5 +1,5 @@
 import { Locator, Page } from 'playwright';
-import { HelperBase } from '../pages/HelperBase';
+import { HelperBase } from './HelperBase';
 
 export class GridHelper extends HelperBase {
   private gridLocator: Locator;
@@ -9,13 +9,13 @@ export class GridHelper extends HelperBase {
     this.gridLocator = page.locator(gridLocator);
   }
 
-  private async getColumnHeaders() {
+  private async getColumnHeaders(): Promise<string[]> {
     return await this.gridLocator
       .locator('[role="grid"] [role="columnheader"]')
       .allTextContents();
   }
 
-  private async getColumnIndexByName(columnName: string) {
+  private async getColumnIndexByName(columnName: string): Promise<number> {
     const columnHeaders = await this.getColumnHeaders();
     const columnIndex = columnHeaders.indexOf(columnName);
     if (columnIndex === -1) {
@@ -24,16 +24,16 @@ export class GridHelper extends HelperBase {
     return columnIndex;
   }
 
-  private async getColumnTextContents(columnIndex: number) {
+  private async getColumnCellContents(columnIndex: number): Promise<string[]> {
     const columnCells = this.gridLocator.locator(
       `[role="gridcell"]:nth-child(${columnIndex + 2})`
     );
     return await columnCells.allTextContents();
   }
 
-   public async assertColumnValuesAreConsistent(columnName: string) {
+  public async assertAllColumnCellsEqual(columnName: string): Promise<string> {
     const columnIndex = await this.getColumnIndexByName(columnName);
-    const columnTexts = await this.getColumnTextContents(columnIndex);
+    const columnTexts = await this.getColumnCellContents(columnIndex);
 
     if (columnTexts.length === 0) {
       throw new Error(`No rows found in the "${columnName}" column`);
@@ -47,26 +47,30 @@ export class GridHelper extends HelperBase {
         );
       }
     }
+    return firstConditionText;
   }
-  
-  public async assertColumnValuesHaveTheSameColor(columnName: string) {
+
+  public async assertColumnCellColorsAreEqual(
+    columnName: string
+  ): Promise<string> {
     const columnIndex = await this.getColumnIndexByName(columnName);
     const columnCells = this.gridLocator.locator(
       `[role="gridcell"]:nth-child(${columnIndex + 2})`
     );
     const firstCellColor = await columnCells.nth(0).evaluate((el) => {
-      return window.getComputedStyle(el).color;
+      return window.getComputedStyle(el).backgroundColor;
     });
 
-    for (let i = 1; i < await columnCells.count(); i++) {
+    for (let i = 1; i < (await columnCells.count()); i++) {
       const cellColor = await columnCells
         .nth(i)
-        .evaluate((el) => window.getComputedStyle(el).color);
+        .evaluate((el) => window.getComputedStyle(el).backgroundColor);
       if (cellColor !== firstCellColor) {
         throw new Error(
           `Inconsistent color found in the "${columnName}" column`
         );
       }
     }
+    return firstCellColor;
   }
 }

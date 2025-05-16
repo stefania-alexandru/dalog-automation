@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
-import { HelperBase } from './HelperBase';
-import { GridHelper } from '../helpers/GridHelper';
+import { HelperBase } from '../helpers/HelperBase';
+import { GridHelper } from '../helpers/Grid';
 
 export class Homepage extends HelperBase {
   readonly pieChartPanels: Locator;
@@ -28,11 +28,11 @@ export class Homepage extends HelperBase {
   }
 
   async validateMachineConditionsColumn() {
-    await this.gridHelper.assertColumnValuesAreConsistent('Condition');
+    return await this.gridHelper.assertAllColumnCellsEqual('Condition');
   }
 
   async validateLastDataUpdateColumn() {
-    await this.gridHelper.assertColumnValuesHaveTheSameColor(
+    return await this.gridHelper.assertColumnCellColorsAreEqual(
       'Last Data Update'
     );
   }
