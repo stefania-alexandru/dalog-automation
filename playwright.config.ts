@@ -11,7 +11,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: process.env.BASE_URL || 'https://app-dev.dalog.net',
+    baseURL: process.env.BASE_URL,
     headless: true,
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
