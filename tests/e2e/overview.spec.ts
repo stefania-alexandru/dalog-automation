@@ -20,7 +20,7 @@ test('should update Machine Conditions table when Last Data piechart filter is c
 }) => {
   const homepage = new Homepage(page, '.machines-container');
 
-  await homepage.clickFilterInPieChart(3, 1);
+  await homepage.clickFilterInPieChart(3, 2);
   const expectedColor = await homepage.validateLastDataUpdateColumn();
-  expect(expectedColor).toBe('rgb(255, 204, 0)');
+  expect(expectedColor).toBe('rgb(255, 126, 13)');
 });
