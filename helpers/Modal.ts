@@ -1,5 +1,6 @@
 import { Locator, Page } from 'playwright';
 import { HelperBase } from './HelperBase';
+import { expect } from '@playwright/test';
 
 export class ModalHelper extends HelperBase {
   constructor(page: Page) {
@@ -24,5 +25,9 @@ export class ModalHelper extends HelperBase {
   ): Promise<void> {
     const input = await this.getInputFieldByLabel(label);
     await input.fill(value);
+    await input.waitFor({ state: 'attached', timeout: 5000 });
+
+    const fieldValue = await input.inputValue();
+    expect(fieldValue).toBe(value);
   }
 }
