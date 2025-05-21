@@ -1,4 +1,4 @@
-import { test } from '../../fixtures/UITestFixtures';
+import { expect, test } from '../../fixtures/UITestFixtures';
 import { Corporation } from '../../../pages/Corporations';
 import { Company } from '../../../pages/Companies';
 import { Project } from '../../../pages/Projects';
@@ -23,7 +23,8 @@ test('Verify that company is created within an existing corporation', async ({
   await page.goto('/companies');
 
   await companyPage.openAddCompanyModal();
-  await companyPage.fillCorporationName(corporationName);
+  await companyPage.openCorporationDropdown();
+  await companyPage.selectCorporationFromDropdown(corporationName);
   const expectedCompanyName = await companyPage.fillCompanyNameInput();
   await companyPage.fillCompanyNumberInput();
   await companyPage.submitCompanyFormAndWaitForApi();
@@ -38,10 +39,11 @@ test('Verify that project is created within an existing company', async ({
   await page.goto('/projects');
 
   await projectPage.openAddProjectModal();
-  await projectPage.fillCompanyNameInputField(companyName);
+  await projectPage.openCompanyDropdown();
+  await projectPage.selectCompanyFromDropdown(companyName);
   const expectedProjectName = await projectPage.fillProjectNameInputField();
-  await projectPage.fillProjectContinentInputField('Europe');
-  await projectPage.fillProjectCountryInputField('Germany');
+  await projectPage.selectContinentFromDropdown('Europe');
+  await projectPage.selectCountryFromDropdown('Germany');
   await projectPage.fillProjectCityInputField('Berlin');
   await projectPage.fillProjectLatitudeInputField();
   await projectPage.fillProjectLongitudeInputField();

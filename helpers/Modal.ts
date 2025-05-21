@@ -19,15 +19,10 @@ export class ModalHelper extends HelperBase {
     return this.page.locator(`button:has-text("${buttonText}")`);
   }
 
-  async fillAutocompleteFieldByLabel(
-    label: string,
-    value: string
-  ): Promise<void> {
-    const input = await this.getInputFieldByLabel(label);
-    await input.fill(value);
-    await input.waitFor({ state: 'attached', timeout: 5000 });
-
-    const fieldValue = await input.inputValue();
-    expect(fieldValue).toBe(value);
+  async selectOptionFromDropdown(option: string) {
+    const optionLocator = this.page.getByRole('option', {
+      name: option,
+    });
+    await optionLocator.click();
   }
 }

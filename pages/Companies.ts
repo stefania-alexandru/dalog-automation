@@ -17,18 +17,21 @@ export class Company extends HelperBase {
     this.addCompanyButton = page.getByRole('button', { name: 'Add' });
   }
 
-  async openAddCompanyModal() {
+  async openAddCompanyModal(): Promise<void> {
     await this.addCompanyButton.click();
   }
 
-  async fillCorporationName(corporationName: string) {
-    await this.modalHelper.fillAutocompleteFieldByLabel(
-      'Corporation: *',
-      corporationName
-    );
+  async openCorporationDropdown() {
+    const corporationDropdown =
+      await this.modalHelper.getInputFieldByLabel('Corporation: *');
+    await corporationDropdown.click();
   }
 
-  async fillCompanyNameInput() {
+  async selectCorporationFromDropdown(corporationName: string): Promise<void> {
+    await this.modalHelper.selectOptionFromDropdown(corporationName);
+  }
+
+  async fillCompanyNameInput(): Promise<string> {
     const companyName = faker.company.name();
 
     const nameInput = await this.modalHelper.getInputFieldByLabel('Name *');
@@ -37,7 +40,7 @@ export class Company extends HelperBase {
     return companyName;
   }
 
-  async fillCompanyNumberInput() {
+  async fillCompanyNumberInput(): Promise<void> {
     const numberInput = await this.modalHelper.getInputFieldByLabel('Number');
     await numberInput.fill(faker.string.numeric(4));
   }

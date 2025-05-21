@@ -21,12 +21,18 @@ export class Project extends HelperBase {
     await this.addProjectButton.click();
   }
 
-  async fillCompanyNameInputField(companyName: string): Promise<void> {
-    await this.modalHelper.fillAutocompleteFieldByLabel('Company', companyName);
+  async openCompanyDropdown(): Promise<void> {
+    const companyDropdown =
+      await this.modalHelper.getInputFieldByLabel('Company');
+    companyDropdown.click();
+  }
+
+  async selectCompanyFromDropdown(companyName: string): Promise<void> {
+    await this.modalHelper.selectOptionFromDropdown(companyName);
   }
 
   async fillProjectNameInputField(): Promise<string> {
-    const projectName = faker.location.state();
+    const projectName = faker.string.alpha(10);
 
     const nameInput = await this.modalHelper.getInputFieldByLabel('Name *');
     await nameInput.fill(projectName);
@@ -34,16 +40,23 @@ export class Project extends HelperBase {
     return projectName;
   }
 
-  async fillProjectContinentInputField(continent: string): Promise<void> {
-    await this.modalHelper.fillAutocompleteFieldByLabel('Continent', continent);
+  async selectContinentFromDropdown(continent: string): Promise<void> {
+    const continentDropdown =
+      await this.modalHelper.getInputFieldByLabel('Continent');
+    await continentDropdown.click();
+    await this.modalHelper.selectOptionFromDropdown(continent);
   }
 
-  async fillProjectCountryInputField(country: string): Promise<void> {
-    await this.modalHelper.fillAutocompleteFieldByLabel('Country', country);
+  async selectCountryFromDropdown(country: string): Promise<void> {
+    const countryDropdown =
+      await this.modalHelper.getInputFieldByLabel('Country');
+    await countryDropdown.click();
+    await this.modalHelper.selectOptionFromDropdown(country);
   }
 
   async fillProjectCityInputField(city: string): Promise<void> {
-    await this.modalHelper.fillAutocompleteFieldByLabel('City', city);
+    const cityField = await this.modalHelper.getInputFieldByLabel('City');
+    await cityField.fill(city);
   }
 
   async fillProjectLatitudeInputField(): Promise<void> {

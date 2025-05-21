@@ -42,7 +42,8 @@ export const test = base.extend<Fixtures>({
 
     await page.goto('/companies');
     await company.openAddCompanyModal();
-    await company.fillCorporationName(corporationName);
+    await company.openCorporationDropdown();
+    await company.selectCorporationFromDropdown(corporationName);
     const name = await company.fillCompanyNameInput();
     await company.fillCompanyNumberInput();
     await company.submitCompanyFormAndWaitForApi();
@@ -63,7 +64,8 @@ export const test = base.extend<Fixtures>({
 
     await page.goto('/projects');
     await project.openAddProjectModal();
-    await project.fillCompanyNameInputField(companyName);
+    await project.openCompanyDropdown();
+    await project.selectCompanyFromDropdown(companyName);
     const name = await project.fillProjectNameInputField();
     await project.submitProjectFormAndWaitForApi();
 
