@@ -8,11 +8,15 @@ export class ModalHelper extends HelperBase {
   }
 
   async getInputFieldByLabel(label: string): Promise<Locator> {
-    return this.page
-      .locator('div.ms-Stack', {
-        has: this.page.locator('span', { hasText: label }),
-      })
-      .locator('input');
+    const stackLocator = this.page.locator('div.ms-Stack').filter({
+      has: this.page
+        .locator('span', { hasText: label })
+        .or(this.page.locator('label', { hasText: `^${label}$` })),
+    });
+
+    const input = stackLocator.locator('input');
+
+    return input.first();
   }
 
   async getButtonByText(buttonText: string): Promise<Locator> {
