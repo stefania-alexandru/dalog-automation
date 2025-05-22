@@ -2,8 +2,9 @@ import { expect, Locator, Page, request } from '@playwright/test';
 import { HelperBase } from '../helpers/HelperBase';
 import { ModalHelper } from '../helpers/Modal';
 import { faker } from '@faker-js/faker';
-import { generateUniquePropertyValue } from '../utils/entitiesUtils';
+import { generateFormattedString } from '../utils/stringUtils';
 import * as dotenv from 'dotenv';
+import { getAuthorizedRequestContext } from '../utils/requestContext';
 
 dotenv.config();
 
@@ -35,11 +36,10 @@ export class Machines extends HelperBase {
   }
 
   async fillIdInputField(): Promise<void> {
+    const dalogId = await this.generateUniqueDalogId();
     const idInputField =
       await this.modalHelper.getInputFieldByLabel('Dalog Id *');
-    await idInputField.fill(
-      await generateUniquePropertyValue('machines', 'dalogId')
-    );
+    await idInputField.fill(dalogId);
   }
 
   async fillMachineNameInputField(): Promise<string> {
@@ -133,5 +133,30 @@ export class Machines extends HelperBase {
 
     const response = await waitForResponse;
     expect(response.status()).toBe(201);
+  }
+
+  private async generateUniqueDalogId(): Promise<string> {
+    const requestContext = await getAuthorizedRequestContext();
+
+    while (true) {
+      const uniqueId = generateFormattedString();
+      const response = await requestContext.get(
+        `${process.env.API_BASE_URL}/dev/meta/read/v1/machines`
+      );
+
+      const companies = await response.json();
+
+      if (Array.isArray(companies)) {
+        const isPropertyValueUnique = companies.some(
+          (entity: { dalogId: string }) => entity.dalogId === uniqueId
+        );
+
+        if (!isPropertyValueUnique) {
+          return uniqueId;
+        }
+      } else {
+        console.error('Expected an array but got:', companies);
+      }
+    }
   }
 }
