@@ -62,8 +62,4 @@ export class Company extends HelperBase {
     const response = await waitForResponse;
     expect(response.status()).toBe(201);
   }
-
-  // async verifyCompanyExistsViaAPI(companyName: string): Promise<void> {
-  //   await findEntityByName('/dev/meta/read/v1/companies', companyName);
-  // }
 }
