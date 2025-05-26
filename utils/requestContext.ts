@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { request, APIRequestContext } from '@playwright/test';
+import { request, APIRequestContext, expect } from '@playwright/test';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -16,4 +16,16 @@ export async function getAuthorizedRequestContext(): Promise<APIRequestContext> 
       'Ocp-Apim-Subscription-Key': process.env.SUBSCRIPTION_KEY || '',
     },
   });
+}
+
+export async function fetchAndVerifyEntityByName(endpoint: string, name: string) {
+  const requestContext = await getAuthorizedRequestContext();
+  const response = await requestContext.get(endpoint);
+  expect(response.ok()).toBeTruthy();
+
+  const entities = await response.json();
+  const entity = entities.find((item: any) => item.name === name);
+  expect(entity).toBeTruthy();
+
+  return entity;
 }
