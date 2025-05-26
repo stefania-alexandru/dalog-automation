@@ -95,13 +95,17 @@ export class Machines extends HelperBase {
   async fillGearboxPowerInputField(): Promise<void> {
     const gearboxPowerInputField =
       await this.modalHelper.getInputFieldByLabel('Gearbox Power');
-    await gearboxPowerInputField.fill(faker.number.int().toString());
+    await gearboxPowerInputField.fill(
+      faker.number.int({ max: 50000 }).toString()
+    );
   }
 
   async fillGearboxRotationalSpeedInputField(): Promise<void> {
     const gearboxRotationalSpeedInputField =
       await this.modalHelper.getInputFieldByLabel('Gearbox Rotational Speed');
-    await gearboxRotationalSpeedInputField.fill(faker.number.int().toString());
+    await gearboxRotationalSpeedInputField.fill(
+      faker.number.int({ max: 50000 }).toString()
+    );
   }
 
   async fillGearboxSerialNumberInputField(): Promise<void> {
