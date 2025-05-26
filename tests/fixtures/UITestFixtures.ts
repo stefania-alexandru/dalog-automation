@@ -2,8 +2,10 @@ import { test as base, expect } from '@playwright/test';
 import { Corporation } from '../../pages/Corporations';
 import { Company } from '../../pages/Companies';
 import { Project } from '../../pages/Projects';
-import { getAuthorizedRequestContext } from '../../utils/requestContext';
-import { findEntityByName } from '../../helpers/Entities';
+import {
+  getAuthorizedRequestContext,
+  fetchAndVerifyEntityByName,
+} from '../../utils/requestContext';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -26,7 +28,7 @@ export const test = base.extend<Fixtures>({
 
     await corporation.fillCorporationNumberInputField();
     await corporation.submitCorporationFormAndWaitForApi();
-    const corporationToMatch = await findEntityByName(
+    const corporationToMatch = await fetchAndVerifyEntityByName(
       '/dev/meta/read/v1/corporations',
       name
     );
@@ -45,7 +47,7 @@ export const test = base.extend<Fixtures>({
     const name = await company.fillCompanyNameInput();
     await company.fillCompanyNumberInput();
     await company.submitCompanyFormAndWaitForApi();
-    await findEntityByName('/dev/meta/read/v1/companies', name);
+    await fetchAndVerifyEntityByName('/dev/meta/read/v1/companies', name);
     await use(name);
   },
 
@@ -58,7 +60,7 @@ export const test = base.extend<Fixtures>({
     await project.selectCompanyFromDropdown(companyName);
     const name = await project.fillProjectNameInputField();
     await project.submitProjectFormAndWaitForApi();
-    await findEntityByName('/dev/meta/read/v1/projects', name);
+    await fetchAndVerifyEntityByName('/dev/meta/read/v1/projects', name);
 
     await use(name);
   },

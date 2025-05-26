@@ -2,7 +2,6 @@ import { expect, Locator, Page, request } from '@playwright/test';
 import { HelperBase } from '../helpers/HelperBase';
 import { ModalHelper } from '../helpers/Modal';
 import { faker } from '@faker-js/faker';
-import { getAuthorizedRequestContext } from '../utils/requestContext';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -104,19 +103,5 @@ export class Project extends HelperBase {
 
     const response = await waitForResponse;
     expect(response.status()).toBe(201);
-  }
-
-  async verifyProjectExistsViaAPI(projectName: string): Promise<void> {
-    const requestContext = await getAuthorizedRequestContext();
-    const response = await requestContext.get('/dev/meta/read/v1/projects');
-
-    expect(response.ok()).toBeTruthy();
-
-    const projects = await response.json();
-    const matchedProject = projects.find(
-      (proj: any) => proj.name === projectName
-    );
-
-    expect(matchedProject).toBeTruthy();
   }
 }
