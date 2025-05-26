@@ -1,4 +1,4 @@
-import { expect, test } from '../../fixtures/UITestFixtures';
+import { test } from '../../fixtures/UITestFixtures';
 import { Corporation } from '../../../pages/Corporations';
 import { Company } from '../../../pages/Companies';
 import { Machines } from '../../../pages/Machines';
@@ -15,6 +15,7 @@ test('Verify that corporation creation is successful', async ({ page }) => {
   await corporationPage.fillCorporationNumberInputField();
   await corporationPage.submitCorporationFormAndWaitForApi();
   await corporationPage.verifyCorporationExistsViaAPI(expectedCorporationName);
+  await Corporation.setCreatedCorporationIdByName(expectedCorporationName);
 });
 
 test('Verify that company is created within an existing corporation', async ({

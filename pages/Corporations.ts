@@ -4,11 +4,13 @@ import { ModalHelper } from '../helpers/Modal';
 import { getAuthorizedRequestContext } from '../utils/requestContext';
 import { faker } from '@faker-js/faker';
 import * as dotenv from 'dotenv';
+import { setCreatedCorporationId } from '../tests/fixtures/UITestFixtures';
 
 dotenv.config();
 
 export class Corporation extends HelperBase {
   private modalHelper: ModalHelper;
+  private generatedCorporationName?: string | null;
   readonly addCorporationButton: Locator;
 
   constructor(page: Page) {
@@ -23,6 +25,7 @@ export class Corporation extends HelperBase {
 
   async fillCorporationNameInputField(): Promise<string> {
     const generatedName = faker.company.name();
+    this.generatedCorporationName = generatedName;
     const nameInput = await this.modalHelper.getInputFieldByLabel('Name *');
     await nameInput.fill(generatedName);
     return generatedName;
@@ -30,7 +33,7 @@ export class Corporation extends HelperBase {
 
   async fillCorporationNumberInputField(): Promise<void> {
     const numberInput = await this.modalHelper.getInputFieldByLabel('Number');
-    await numberInput.fill(faker.string.numeric(4));
+    await numberInput.fill(faker.string.numeric(7));
   }
 
   async clickSaveChangesButton(): Promise<void> {
@@ -52,17 +55,33 @@ export class Corporation extends HelperBase {
     expect(response.status()).toBe(201);
   }
 
-  async verifyCorporationExistsViaAPI(corporationName: string): Promise<void> {
+  private static async fetchCorporationByName(
+    corporationName: string
+  ): Promise<any | undefined> {
     const requestContext = await getAuthorizedRequestContext();
     const response = await requestContext.get('/dev/meta/read/v1/corporations');
-
     expect(response.ok()).toBeTruthy();
 
     const corporations = await response.json();
-    const matchedCorporation = corporations.find(
-      (corp: any) => corp.name === corporationName
-    );
+    return corporations.find((corp: any) => corp.name === corporationName);
+  }
 
+  async verifyCorporationExistsViaAPI(corporationName: string): Promise<void> {
+    const matchedCorporation =
+      await Corporation.fetchCorporationByName(corporationName);
     expect(matchedCorporation).toBeTruthy();
+  }
+
+  static async setCreatedCorporationIdByName(corporationName: string): Promise<void> {
+    const requestContext = await getAuthorizedRequestContext();
+    const response = await requestContext.get('/dev/meta/read/v1/corporations');
+    expect(response.ok()).toBeTruthy();
+  
+    const corporations = await response.json();
+    const match = corporations.find((corp: any) => corp.name === corporationName);
+  
+    if (match) {
+      setCreatedCorporationId(match.id);
+    }
   }
 }

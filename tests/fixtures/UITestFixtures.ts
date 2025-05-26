@@ -3,6 +3,7 @@ import { Corporation } from '../../pages/Corporations';
 import { Company } from '../../pages/Companies';
 import { Project } from '../../pages/Projects';
 import { getAuthorizedRequestContext } from '../../utils/requestContext';
+import { findEntityByName } from '../../helpers/Entities';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -13,6 +14,8 @@ type Fixtures = {
   projectName: string;
 };
 
+let createdCorporationId: string | null;
+
 export const test = base.extend<Fixtures>({
   corporationName: async ({ page }, use) => {
     const corporation = new Corporation(page);
@@ -20,19 +23,14 @@ export const test = base.extend<Fixtures>({
     await page.goto('/corporations');
     await corporation.openAddCorporationModal();
     const name = await corporation.fillCorporationNameInputField();
+
     await corporation.fillCorporationNumberInputField();
     await corporation.submitCorporationFormAndWaitForApi();
-
-    const requestContext = await getAuthorizedRequestContext();
-    const response = await requestContext.get('/dev/meta/read/v1/corporations');
-    expect(response.ok()).toBeTruthy();
-
-    const corporations = await response.json();
-    const corporationToMatch = corporations.find(
-      (corp: any) => corp.name === name
+    const corporationToMatch = await findEntityByName(
+      '/dev/meta/read/v1/corporations',
+      name
     );
-
-    expect(corporationToMatch).toBeTruthy();
+    createdCorporationId = corporationToMatch.id;
 
     await use(name);
   },
@@ -47,15 +45,7 @@ export const test = base.extend<Fixtures>({
     const name = await company.fillCompanyNameInput();
     await company.fillCompanyNumberInput();
     await company.submitCompanyFormAndWaitForApi();
-
-    const requestContext = await getAuthorizedRequestContext();
-    const response = await requestContext.get('/dev/meta/read/v1/companies');
-    expect(response.ok()).toBeTruthy();
-
-    const companies = await response.json();
-    const companyToMatch = companies.find((comp: any) => comp.name === name);
-    expect(companyToMatch).toBeTruthy();
-
+    await findEntityByName('/dev/meta/read/v1/companies', name);
     await use(name);
   },
 
@@ -68,17 +58,25 @@ export const test = base.extend<Fixtures>({
     await project.selectCompanyFromDropdown(companyName);
     const name = await project.fillProjectNameInputField();
     await project.submitProjectFormAndWaitForApi();
-
-    const requestContext = await getAuthorizedRequestContext();
-    const response = await requestContext.get('/dev/meta/read/v1/projects');
-    expect(response.ok()).toBeTruthy();
-
-    const projects = await response.json();
-    const projectToMatch = projects.find((proj: any) => proj.name === name);
-    expect(projectToMatch).toBeTruthy();
+    await findEntityByName('/dev/meta/read/v1/projects', name);
 
     await use(name);
   },
 });
 
 export { expect };
+
+export function setCreatedCorporationId(id: string) {
+  createdCorporationId = id;
+}
+
+test.afterEach(async () => {
+  if (createdCorporationId) {
+    const requestContext = await getAuthorizedRequestContext();
+    const response = await requestContext.delete(
+      `/dev/meta/write/v1/corporations/${createdCorporationId}`
+    );
+    expect(response.ok()).toBeTruthy();
+    createdCorporationId = null;
+  }
+});
