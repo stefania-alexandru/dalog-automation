@@ -78,7 +78,7 @@ test('Verify that machine is created within an existing project', async ({
   await machinePage.openProjectDropdown();
   await machinePage.selectProjectFromDropdown(projectName);
   await machinePage.fillIdInputField();
-  const expectedMachineName = await machinePage.fillMachineNameInputField();
+  await machinePage.fillMachineNameInputField();
   await machinePage.filCustomerCodeInputField();
   await machinePage.fillManufacturerInputField();
   await machinePage.fillProcessInputField();
