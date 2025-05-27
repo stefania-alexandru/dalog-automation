@@ -18,7 +18,7 @@ export class Homepage extends HelperBase {
    * @param index - The 1-based index of the pie chart (1 for the first, 2 for the second, etc.).
    * @param filterIndex - The 0-based index of the filter (legend circle) in the selected pie chart.
    */
-  async clickFilterInPieChart(index: number, filterIndex: number) {
+  async clickFilterInPieChart(index: number, filterIndex: number): Promise<void> {
     const filterCircle = this.pieChartPanels
       .nth(index - 1)
       .locator('.legend-circle')

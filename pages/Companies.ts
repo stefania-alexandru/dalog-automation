@@ -20,7 +20,7 @@ export class Company extends HelperBase {
     await this.addCompanyButton.click();
   }
 
-  async openCorporationDropdown() {
+  async openCorporationDropdown(): Promise<void> {
     const corporationDropdown =
       await this.modalHelper.getInputFieldByLabel('Corporation: *');
     await corporationDropdown.click();

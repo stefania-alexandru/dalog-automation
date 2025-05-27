@@ -18,7 +18,10 @@ export async function getAuthorizedRequestContext(): Promise<APIRequestContext> 
   });
 }
 
-export async function fetchAndVerifyEntityByName(endpoint: string, name: string) {
+export async function fetchAndVerifyEntityByName(
+  endpoint: string,
+  name: string
+): Promise<any> {
   const requestContext = await getAuthorizedRequestContext();
   const response = await requestContext.get(endpoint);
   expect(response.ok()).toBeTruthy();
