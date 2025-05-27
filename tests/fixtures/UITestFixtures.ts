@@ -5,7 +5,7 @@ import { Project } from '../../pages/Projects';
 import {
   getAuthorizedRequestContext,
   fetchAndVerifyEntityByName,
-} from '../../utils/requestContext';
+} from '../../utils/apiUtils';
 import * as dotenv from 'dotenv';
 
 dotenv.config();

@@ -4,7 +4,7 @@ import { ModalHelper } from '../helpers/Modal';
 import { faker } from '@faker-js/faker';
 import { generateFormattedString } from '../utils/stringUtils';
 import * as dotenv from 'dotenv';
-import { getAuthorizedRequestContext } from '../utils/requestContext';
+import { getAuthorizedRequestContext } from '../utils/apiUtils';
 
 dotenv.config();
 

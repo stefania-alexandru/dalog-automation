@@ -1,7 +1,7 @@
 import { expect, Locator, Page, request } from '@playwright/test';
 import { HelperBase } from '../helpers/HelperBase';
 import { ModalHelper } from '../helpers/Modal';
-import { fetchAndVerifyEntityByName } from '../utils/requestContext';
+import { fetchAndVerifyEntityByName } from '../utils/apiUtils';
 import { faker } from '@faker-js/faker';
 import * as dotenv from 'dotenv';
 import { setCreatedCorporationId } from '../tests/fixtures/UITestFixtures';

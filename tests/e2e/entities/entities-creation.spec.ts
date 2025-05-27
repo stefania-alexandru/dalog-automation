@@ -3,7 +3,7 @@ import { Corporation } from '../../../pages/Corporations';
 import { Company } from '../../../pages/Companies';
 import { Machines } from '../../../pages/Machines';
 import { Project } from '../../../pages/Projects';
-import { fetchAndVerifyEntityByName } from '../../../utils/requestContext';
+import { fetchAndVerifyEntityByName } from '../../../utils/apiUtils';
 
 test('Verify that corporation creation is successful', async ({ page }) => {
   const corporationPage = new Corporation(page);
@@ -60,7 +60,10 @@ test('Verify that project is created within an existing company', async ({
   await projectPage.fillProjectLatitudeInputField();
   await projectPage.fillProjectLongitudeInputField();
   await projectPage.submitProjectFormAndWaitForApi();
-  await fetchAndVerifyEntityByName('/dev/meta/read/v1/projects', expectedProjectName);
+  await fetchAndVerifyEntityByName(
+    '/dev/meta/read/v1/projects',
+    expectedProjectName
+  );
 });
 
 test('Verify that machine is created within an existing project', async ({
