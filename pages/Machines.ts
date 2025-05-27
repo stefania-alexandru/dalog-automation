@@ -141,25 +141,22 @@ export class Machines extends HelperBase {
 
   private async generateUniqueDalogId(): Promise<string> {
     const requestContext = await getAuthorizedRequestContext();
+    const response = await requestContext.get(
+      `${process.env.API_BASE_URL}/dev/meta/read/v1/machines`
+    );
+    const companies = await response.json();
+
+    if (!Array.isArray(companies)) {
+      console.error('Error: Expected a list of companies');
+      throw new Error('Invalid data format');
+    }
 
     while (true) {
-      const uniqueId = generateFormattedString();
-      const response = await requestContext.get(
-        `${process.env.API_BASE_URL}/dev/meta/read/v1/machines`
-      );
+      const newId = generateFormattedString();
+      const isIdTaken = companies.some((company) => company.dalogId === newId);
 
-      const companies = await response.json();
-
-      if (Array.isArray(companies)) {
-        const isPropertyValueUnique = companies.some(
-          (entity: { dalogId: string }) => entity.dalogId === uniqueId
-        );
-
-        if (!isPropertyValueUnique) {
-          return uniqueId;
-        }
-      } else {
-        console.error('Expected an array but got:', companies);
+      if (!isIdTaken) {
+        return newId;
       }
     }
   }
