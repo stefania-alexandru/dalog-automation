@@ -5,6 +5,7 @@ import { fetchAndVerifyEntityByName } from '../utils/apiUtils';
 import { faker } from '@faker-js/faker';
 import * as dotenv from 'dotenv';
 import { setCreatedCorporationId } from '../tests/fixtures/UITestFixtures';
+import { API_ENDPOINTS } from '../utils/apiEndpoints';
 
 dotenv.config();
 
@@ -42,7 +43,7 @@ export class Corporation extends HelperBase {
   async submitCorporationFormAndWaitForApi(): Promise<void> {
     const waitForResponse = this.page.waitForResponse(
       (res) =>
-        res.url().includes('/dev/meta/write/v1/corporations') &&
+        res.url().includes(API_ENDPOINTS.CORPORATIONS_POST) &&
         res.status() === 201 &&
         res.request().method() === 'POST'
     );
@@ -57,7 +58,7 @@ export class Corporation extends HelperBase {
     corporationName: string
   ): Promise<void> {
     const match = await fetchAndVerifyEntityByName(
-      '/dev/meta/read/v1/corporations',
+      API_ENDPOINTS.CORPORATIONS_GET,
       corporationName
     );
     if (match) {

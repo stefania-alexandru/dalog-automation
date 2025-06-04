@@ -5,6 +5,7 @@ import { faker } from '@faker-js/faker';
 import { generateFormattedString } from '../utils/stringUtils';
 import * as dotenv from 'dotenv';
 import { getAuthorizedRequestContext } from '../utils/apiUtils';
+import { API_ENDPOINTS } from '../utils/apiEndpoints';
 
 dotenv.config();
 
@@ -141,13 +142,10 @@ export class Machines extends HelperBase {
 
   private async generateUniqueDalogId(): Promise<string> {
     const requestContext = await getAuthorizedRequestContext();
-    const response = await requestContext.get(
-      `${process.env.API_BASE_URL}/dev/meta/read/v1/machines`
-    );
+    const response = await requestContext.get(API_ENDPOINTS.MACHINES_GET);
     const companies = await response.json();
 
     if (!Array.isArray(companies)) {
-      console.error('Error: Expected a list of companies');
       throw new Error('Invalid data format');
     }
 

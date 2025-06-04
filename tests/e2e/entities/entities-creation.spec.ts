@@ -4,6 +4,7 @@ import { Company } from '../../../pages/Companies';
 import { Machines } from '../../../pages/Machines';
 import { Project } from '../../../pages/Projects';
 import { fetchAndVerifyEntityByName } from '../../../utils/apiUtils';
+import { API_ENDPOINTS } from '../../../utils/apiEndpoints';
 
 test('Verify that corporation creation is successful', async ({ page }) => {
   const corporationPage = new Corporation(page);
@@ -16,7 +17,7 @@ test('Verify that corporation creation is successful', async ({ page }) => {
   await corporationPage.fillCorporationNumberInputField();
   await corporationPage.submitCorporationFormAndWaitForApi();
   await fetchAndVerifyEntityByName(
-    '/dev/meta/read/v1/corporations',
+    API_ENDPOINTS.CORPORATIONS_GET,
     expectedCorporationName
   );
   await Corporation.setCreatedCorporationIdByName(expectedCorporationName);
@@ -37,7 +38,7 @@ test('Verify that company is created within an existing corporation', async ({
   await companyPage.fillCompanyNumberInput();
   await companyPage.submitCompanyFormAndWaitForApi();
   await fetchAndVerifyEntityByName(
-    '/dev/meta/read/v1/companies',
+    API_ENDPOINTS.COMPANIES_GET,
     expectedCompanyName
   );
 });
@@ -61,7 +62,7 @@ test('Verify that project is created within an existing company', async ({
   await projectPage.fillProjectLongitudeInputField();
   await projectPage.submitProjectFormAndWaitForApi();
   await fetchAndVerifyEntityByName(
-    '/dev/meta/read/v1/projects',
+   API_ENDPOINTS.PROJECTS_GET,
     expectedProjectName
   );
 });
