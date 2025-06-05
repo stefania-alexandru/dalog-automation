@@ -26,6 +26,7 @@ export class ModalHelper extends HelperBase {
   async selectOptionFromDropdown(option: string) {
     const optionLocator = this.page.getByRole('option', {
       name: option,
+      exact: true,
     });
     await optionLocator.click();
   }

@@ -141,6 +141,11 @@ export class Machines extends HelperBase {
     await this.clickSaveChangesButton();
 
     const response = await waitForResponse;
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create machine: ${response.status()} - ${response.statusText()}`
+      );
+    }
     expect(response.status()).toBe(201);
   }
 
