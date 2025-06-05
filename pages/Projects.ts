@@ -4,7 +4,7 @@ import { ModalHelper } from '../helpers/Modal';
 import { faker } from '@faker-js/faker';
 import * as dotenv from 'dotenv';
 import { API_ENDPOINTS } from '../utils/apiEndpoints';
-import { getAuthorizedRequestContext } from '../utils/apiUtils';
+import { generateUniqueEntityName } from '../utils/stringUtils';
 
 dotenv.config();
 
@@ -33,7 +33,10 @@ export class Project extends HelperBase {
   }
 
   async fillProjectNameInputField(): Promise<string> {
-    const generatedUniqueProjectName = await this.generateUniqueProjectName();
+    const generatedUniqueProjectName = await generateUniqueEntityName(
+      API_ENDPOINTS.PROJECTS_GET,
+      'project'
+    );
 
     const nameInput = await this.modalHelper.getInputFieldByLabel('Name *');
     await nameInput.fill(generatedUniqueProjectName);
@@ -105,26 +108,5 @@ export class Project extends HelperBase {
 
     const response = await waitForResponse;
     expect(response.status()).toBe(201);
-  }
-
-  private async generateUniqueProjectName(): Promise<string> {
-    const requestContext = await getAuthorizedRequestContext();
-    const response = await requestContext.get(API_ENDPOINTS.PROJECTS_GET);
-    const projects = await response.json();
-
-    if (!Array.isArray(projects)) {
-      throw new Error('Invalid data format');
-    }
-
-    while (true) {
-      const newProjectName = faker.commerce.product();
-      const isNameTaken = projects.some(
-        (project) => project.name === newProjectName
-      );
-
-      if (!isNameTaken) {
-        return newProjectName;
-      }
-    }
   }
 }

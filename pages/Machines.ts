@@ -6,6 +6,7 @@ import { generateFormattedString } from '../utils/stringUtils';
 import * as dotenv from 'dotenv';
 import { getAuthorizedRequestContext } from '../utils/apiUtils';
 import { API_ENDPOINTS } from '../utils/apiEndpoints';
+import { generateUniqueEntityName } from '../utils/stringUtils';
 
 dotenv.config();
 
@@ -44,7 +45,10 @@ export class Machines extends HelperBase {
   }
 
   async fillMachineNameInputField(): Promise<string> {
-    const generatedUniqueMachineName = await this.generateUniqueMachineName();
+    const generatedUniqueMachineName = await generateUniqueEntityName(
+      API_ENDPOINTS.MACHINES_GET,
+      'machine'
+    );
 
     const nameInput = await this.modalHelper.getInputFieldByLabel('Name');
     await nameInput.fill(generatedUniqueMachineName);
@@ -155,27 +159,6 @@ export class Machines extends HelperBase {
 
       if (!isIdTaken) {
         return newId;
-      }
-    }
-  }
-
-  private async generateUniqueMachineName(): Promise<string> {
-    const requestContext = await getAuthorizedRequestContext();
-    const response = await requestContext.get(API_ENDPOINTS.MACHINES_GET);
-    const machines = await response.json();
-
-    if (!Array.isArray(machines)) {
-      throw new Error('Invalid data format');
-    }
-
-    while (true) {
-      const newMachineName = faker.commerce.product();
-      const isNameTaken = machines.some(
-        (machine) => machine.name === newMachineName
-      );
-
-      if (!isNameTaken) {
-        return newMachineName;
       }
     }
   }
