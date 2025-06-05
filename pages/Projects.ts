@@ -3,6 +3,8 @@ import { HelperBase } from '../helpers/HelperBase';
 import { ModalHelper } from '../helpers/Modal';
 import { faker } from '@faker-js/faker';
 import * as dotenv from 'dotenv';
+import { API_ENDPOINTS } from '../utils/apiEndpoints';
+import { getAuthorizedRequestContext } from '../utils/apiUtils';
 
 dotenv.config();
 
@@ -31,12 +33,12 @@ export class Project extends HelperBase {
   }
 
   async fillProjectNameInputField(): Promise<string> {
-    const projectName = faker.string.alpha(10);
+    const generatedUniqueProjectName = await this.generateUniqueProjectName();
 
     const nameInput = await this.modalHelper.getInputFieldByLabel('Name *');
-    await nameInput.fill(projectName);
+    await nameInput.fill(generatedUniqueProjectName);
 
-    return projectName;
+    return generatedUniqueProjectName;
   }
 
   async selectContinentFromDropdown(continent: string): Promise<void> {
@@ -94,7 +96,7 @@ export class Project extends HelperBase {
   async submitProjectFormAndWaitForApi(): Promise<void> {
     const waitForResponse = this.page.waitForResponse(
       (res) =>
-        res.url().includes('/dev/meta/write/v1/projects') &&
+        res.url().includes(API_ENDPOINTS.PROJECTS_POST) &&
         res.status() === 201 &&
         res.request().method() === 'POST'
     );
@@ -103,5 +105,26 @@ export class Project extends HelperBase {
 
     const response = await waitForResponse;
     expect(response.status()).toBe(201);
+  }
+
+  private async generateUniqueProjectName(): Promise<string> {
+    const requestContext = await getAuthorizedRequestContext();
+    const response = await requestContext.get(API_ENDPOINTS.PROJECTS_GET);
+    const projects = await response.json();
+
+    if (!Array.isArray(projects)) {
+      throw new Error('Invalid data format');
+    }
+
+    while (true) {
+      const newProjectName = faker.commerce.product();
+      const isNameTaken = projects.some(
+        (project) => project.name === newProjectName
+      );
+
+      if (!isNameTaken) {
+        return newProjectName;
+      }
+    }
   }
 }

@@ -1,10 +1,14 @@
 import { expect, Locator, Page, request } from '@playwright/test';
 import { HelperBase } from '../helpers/HelperBase';
 import { ModalHelper } from '../helpers/Modal';
-import { fetchAndVerifyEntityByName } from '../utils/apiUtils';
+import {
+  fetchAndVerifyEntityByName,
+  getAuthorizedRequestContext,
+} from '../utils/apiUtils';
 import { faker } from '@faker-js/faker';
 import * as dotenv from 'dotenv';
 import { setCreatedCorporationId } from '../tests/fixtures/UITestFixtures';
+import { API_ENDPOINTS } from '../utils/apiEndpoints';
 
 dotenv.config();
 
@@ -23,10 +27,13 @@ export class Corporation extends HelperBase {
   }
 
   async fillCorporationNameInputField(): Promise<string> {
-    const generatedName = faker.company.name();
+    const generatedUniqueCorporationName =
+      await this.generateUniqueCorporationName();
+
     const nameInput = await this.modalHelper.getInputFieldByLabel('Name *');
-    await nameInput.fill(generatedName);
-    return generatedName;
+    await nameInput.fill(generatedUniqueCorporationName);
+
+    return generatedUniqueCorporationName;
   }
 
   async fillCorporationNumberInputField(): Promise<void> {
@@ -42,7 +49,7 @@ export class Corporation extends HelperBase {
   async submitCorporationFormAndWaitForApi(): Promise<void> {
     const waitForResponse = this.page.waitForResponse(
       (res) =>
-        res.url().includes('/dev/meta/write/v1/corporations') &&
+        res.url().includes(API_ENDPOINTS.CORPORATIONS_POST) &&
         res.status() === 201 &&
         res.request().method() === 'POST'
     );
@@ -57,11 +64,32 @@ export class Corporation extends HelperBase {
     corporationName: string
   ): Promise<void> {
     const match = await fetchAndVerifyEntityByName(
-      '/dev/meta/read/v1/corporations',
+      API_ENDPOINTS.CORPORATIONS_GET,
       corporationName
     );
     if (match) {
       setCreatedCorporationId(match.id);
+    }
+  }
+
+  private async generateUniqueCorporationName(): Promise<string> {
+    const requestContext = await getAuthorizedRequestContext();
+    const response = await requestContext.get(API_ENDPOINTS.CORPORATIONS_GET);
+    const corporations = await response.json();
+
+    if (!Array.isArray(corporations)) {
+      throw new Error('Invalid data format');
+    }
+
+    while (true) {
+      const newCorporationName = faker.company.name();
+      const isNameTaken = corporations.some(
+        (corporation) => corporation.name === newCorporationName
+      );
+
+      if (!isNameTaken) {
+        return newCorporationName;
+      }
     }
   }
 }

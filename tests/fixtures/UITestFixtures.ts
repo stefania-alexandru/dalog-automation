@@ -7,6 +7,7 @@ import {
   fetchAndVerifyEntityByName,
 } from '../../utils/apiUtils';
 import * as dotenv from 'dotenv';
+import { API_ENDPOINTS } from '../../utils/apiEndpoints';
 
 dotenv.config();
 
@@ -29,7 +30,7 @@ export const test = base.extend<Fixtures>({
     await corporation.fillCorporationNumberInputField();
     await corporation.submitCorporationFormAndWaitForApi();
     const corporationToMatch = await fetchAndVerifyEntityByName(
-      '/dev/meta/read/v1/corporations',
+      API_ENDPOINTS.CORPORATIONS_GET,
       name
     );
     createdCorporationId = corporationToMatch.id;
@@ -47,7 +48,7 @@ export const test = base.extend<Fixtures>({
     const name = await company.fillCompanyNameInput();
     await company.fillCompanyNumberInput();
     await company.submitCompanyFormAndWaitForApi();
-    await fetchAndVerifyEntityByName('/dev/meta/read/v1/companies', name);
+    await fetchAndVerifyEntityByName(API_ENDPOINTS.COMPANIES_GET, name);
     await use(name);
   },
 
@@ -60,7 +61,7 @@ export const test = base.extend<Fixtures>({
     await project.selectCompanyFromDropdown(companyName);
     const name = await project.fillProjectNameInputField();
     await project.submitProjectFormAndWaitForApi();
-    await fetchAndVerifyEntityByName('/dev/meta/read/v1/projects', name);
+    await fetchAndVerifyEntityByName(API_ENDPOINTS.PROJECTS_GET, name);
 
     await use(name);
   },
@@ -76,7 +77,7 @@ test.afterEach(async () => {
   if (createdCorporationId) {
     const requestContext = await getAuthorizedRequestContext();
     const response = await requestContext.delete(
-      `/dev/meta/write/v1/corporations/${createdCorporationId}`
+      `${API_ENDPOINTS.CORPORATIONS_POST}/${createdCorporationId}`
     );
     expect(response.ok()).toBeTruthy();
     createdCorporationId = null;
