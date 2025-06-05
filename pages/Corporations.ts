@@ -57,6 +57,11 @@ export class Corporation extends HelperBase {
     await this.clickSaveChangesButton();
 
     const response = await waitForResponse;
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to create corporation: ${response.status()} - ${response.statusText()}`
+      );
+    }
     expect(response.status()).toBe(201);
   }
 
