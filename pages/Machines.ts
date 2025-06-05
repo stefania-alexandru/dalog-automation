@@ -44,12 +44,12 @@ export class Machines extends HelperBase {
   }
 
   async fillMachineNameInputField(): Promise<string> {
-    const machineName = faker.commerce.product();
+    const generatedUniqueMachineName = await this.generateUniqueMachineName();
 
     const nameInput = await this.modalHelper.getInputFieldByLabel('Name');
-    await nameInput.fill(machineName);
+    await nameInput.fill(generatedUniqueMachineName);
 
-    return machineName;
+    return generatedUniqueMachineName;
   }
 
   async filCustomerCodeInputField(): Promise<void> {
@@ -129,7 +129,7 @@ export class Machines extends HelperBase {
   async verifyAPICreationIsSuccessful(): Promise<void> {
     const waitForResponse = this.page.waitForResponse(
       (res) =>
-        res.url().includes('/dev/meta/write/v1/machines') &&
+        res.url().includes(API_ENDPOINTS.MACHINES_POST) &&
         res.status() === 201 &&
         res.request().method() === 'POST'
     );
@@ -155,6 +155,27 @@ export class Machines extends HelperBase {
 
       if (!isIdTaken) {
         return newId;
+      }
+    }
+  }
+
+  private async generateUniqueMachineName(): Promise<string> {
+    const requestContext = await getAuthorizedRequestContext();
+    const response = await requestContext.get(API_ENDPOINTS.MACHINES_GET);
+    const machines = await response.json();
+
+    if (!Array.isArray(machines)) {
+      throw new Error('Invalid data format');
+    }
+
+    while (true) {
+      const newMachineName = faker.commerce.product();
+      const isNameTaken = machines.some(
+        (machine) => machine.name === newMachineName
+      );
+
+      if (!isNameTaken) {
+        return newMachineName;
       }
     }
   }
