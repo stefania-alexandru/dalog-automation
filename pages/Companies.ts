@@ -4,7 +4,7 @@ import { ModalHelper } from '../helpers/Modal';
 import { faker } from '@faker-js/faker';
 import * as dotenv from 'dotenv';
 import { API_ENDPOINTS } from '../utils/apiEndpoints';
-import { getAuthorizedRequestContext } from '../utils/apiUtils';
+import { generateUniqueEntityName } from '../utils/stringUtils';
 
 dotenv.config();
 
@@ -33,7 +33,10 @@ export class Company extends HelperBase {
   }
 
   async fillCompanyNameInput(): Promise<string> {
-    const generatedUniqueCompanyName = await this.generateUniqueCompanyName();
+    const generatedUniqueCompanyName = await generateUniqueEntityName(
+      API_ENDPOINTS.COMPANIES_GET,
+      'company'
+    );
     const nameInput = await this.modalHelper.getInputFieldByLabel('Name *');
 
     await nameInput.fill(generatedUniqueCompanyName);
@@ -63,26 +66,5 @@ export class Company extends HelperBase {
 
     const response = await waitForResponse;
     expect(response.status()).toBe(201);
-  }
-
-  private async generateUniqueCompanyName(): Promise<string> {
-    const requestContext = await getAuthorizedRequestContext();
-    const response = await requestContext.get(API_ENDPOINTS.COMPANIES_GET);
-    const companies = await response.json();
-
-    if (!Array.isArray(companies)) {
-      throw new Error('Invalid data format');
-    }
-
-    while (true) {
-      const newCompanyName = faker.company.name();
-      const isNameTaken = companies.some(
-        (companies) => companies.name === newCompanyName
-      );
-
-      if (!isNameTaken) {
-        return newCompanyName;
-      }
-    }
   }
 }

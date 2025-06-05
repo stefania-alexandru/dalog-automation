@@ -1,14 +1,12 @@
 import { expect, Locator, Page, request } from '@playwright/test';
 import { HelperBase } from '../helpers/HelperBase';
 import { ModalHelper } from '../helpers/Modal';
-import {
-  fetchAndVerifyEntityByName,
-  getAuthorizedRequestContext,
-} from '../utils/apiUtils';
+import { fetchAndVerifyEntityByName } from '../utils/apiUtils';
 import { faker } from '@faker-js/faker';
 import * as dotenv from 'dotenv';
 import { setCreatedCorporationId } from '../tests/fixtures/UITestFixtures';
 import { API_ENDPOINTS } from '../utils/apiEndpoints';
+import { generateUniqueEntityName } from '../utils/stringUtils';
 
 dotenv.config();
 
@@ -27,8 +25,10 @@ export class Corporation extends HelperBase {
   }
 
   async fillCorporationNameInputField(): Promise<string> {
-    const generatedUniqueCorporationName =
-      await this.generateUniqueCorporationName();
+    const generatedUniqueCorporationName = await generateUniqueEntityName(
+      API_ENDPOINTS.COMPANIES_GET,
+      'corporation'
+    );
 
     const nameInput = await this.modalHelper.getInputFieldByLabel('Name *');
     await nameInput.fill(generatedUniqueCorporationName);
@@ -69,27 +69,6 @@ export class Corporation extends HelperBase {
     );
     if (match) {
       setCreatedCorporationId(match.id);
-    }
-  }
-
-  private async generateUniqueCorporationName(): Promise<string> {
-    const requestContext = await getAuthorizedRequestContext();
-    const response = await requestContext.get(API_ENDPOINTS.CORPORATIONS_GET);
-    const corporations = await response.json();
-
-    if (!Array.isArray(corporations)) {
-      throw new Error('Invalid data format');
-    }
-
-    while (true) {
-      const newCorporationName = faker.company.name();
-      const isNameTaken = corporations.some(
-        (corporation) => corporation.name === newCorporationName
-      );
-
-      if (!isNameTaken) {
-        return newCorporationName;
-      }
     }
   }
 }
